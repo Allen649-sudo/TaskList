@@ -14,21 +14,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -39,9 +33,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun TaskCardScreen() {
-    val viewModel: TaskViewModel = viewModel(factory = TaskViewModel.factory)
+fun TaskCardScreen(viewModel: TaskViewModel = viewModel(factory = TaskViewModel.factory)) {
     val tasks by viewModel.tasks.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.fetchTask()
     }
@@ -54,7 +48,7 @@ fun TaskCardScreen() {
                     .shadow(5.dp, RoundedCornerShape(24.dp))
                     .border(1.dp, Color(0xFFFFEBF2), RoundedCornerShape(24.dp)),
                 backgroundColor = Color(0xFFFFE4ED),
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(20.dp),
             ) {
                 Row(
                     modifier = Modifier.padding(8.dp), // Отступы внутри карточки
@@ -69,6 +63,14 @@ fun TaskCardScreen() {
                             fontSize = 20.sp,
                             maxLines = 2, // Ограничиваем текст одной линией
                             overflow = TextOverflow.Ellipsis // Добавляем многоточие, если текст длиннее
+                        )
+
+                        Text(
+                            text = task.time,
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -89,4 +91,3 @@ fun TaskCardScreen() {
         }
     }
 }
-
