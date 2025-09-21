@@ -1,6 +1,7 @@
 package com.example.tasklist
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,14 +31,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun TaskCardScreen(viewModel: TaskViewModel = viewModel(factory = TaskViewModel.factory)) {
+fun TaskCardScreen(
+    viewModel: TaskViewModel,
+    onEditText: (Task) -> Unit,
+    onRequestDelete: (Task) -> Unit
+) {
     val tasks by viewModel.tasks.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.fetchTask()
+        viewModel.fetchTasks()
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(8.dp)) {
@@ -45,10 +49,13 @@ fun TaskCardScreen(viewModel: TaskViewModel = viewModel(factory = TaskViewModel.
             Card(
                 modifier = Modifier
                     .fillMaxWidth() // Используем fillMaxWidth, чтобы карточка занимала всю ширину
-                    .shadow(5.dp, RoundedCornerShape(24.dp))
-                    .border(1.dp, Color(0xFFFFEBF2), RoundedCornerShape(24.dp)),
-                backgroundColor = Color(0xFFFFE4ED),
-                shape = RoundedCornerShape(20.dp),
+                    .shadow(5.dp, RoundedCornerShape(12.dp))
+                    .border(1.dp, Color(0xFFFFF7FA), RoundedCornerShape(12.dp))
+                    .clickable {
+                        onEditText(task)
+                    },
+                backgroundColor = Color(0xFFFDE9F0),
+                shape = RoundedCornerShape(12.dp),
             ) {
                 Row(
                     modifier = Modifier.padding(8.dp), // Отступы внутри карточки
@@ -78,7 +85,9 @@ fun TaskCardScreen(viewModel: TaskViewModel = viewModel(factory = TaskViewModel.
                     Button(
                         onClick = {
                             viewModel.deleteTask(task) // Обработка нажатия кнопки
-                        }
+                            onRequestDelete(task)
+                        },
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Icon(imageVector = Icons.Filled.Close, contentDescription = "Удалить задачу", tint = Color.White)
                     }

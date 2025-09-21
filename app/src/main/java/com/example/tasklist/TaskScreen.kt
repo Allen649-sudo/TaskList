@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -23,19 +24,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import java.util.Calendar
 
 @Composable
-fun TaskScreen() {
-    val viewModel: TaskViewModel = viewModel(factory = TaskViewModel.factory)
+fun TaskScreen(
+    viewModel: TaskViewModel,
+    onEditText: (Task) -> Unit,
+){
+
+    var taskToDelete by remember { mutableStateOf<Task?>(null) }
+    var playAnimation by remember { mutableStateOf(false) }
+
+    val frames = listOf(
+        R.drawable.anim_delete_0,
+        R.drawable.anim_delete_1,
+        R.drawable.anim_delete_2,
+        R.drawable.anim_delete_3,
+        R.drawable.anim_delete_4,
+        R.drawable.anim_delete_5,
+        R.drawable.anim_delete_6
+    )
+
     var searchQuery by remember { mutableStateOf("") }
     var selectedTime by remember { mutableStateOf("") }
     val context = LocalContext.current // Объявляем контекст
-
+    if (playAnimation) {
+        SpriteAnimation(
+            frames = frames,
+            onAnimationEnd = {
+                taskToDelete?.let { viewModel.deleteTask(it) }
+                taskToDelete = null
+                playAnimation = false
+            }
+        )
+    }
     Column(modifier = Modifier.fillMaxSize())  {
         Spacer(modifier = Modifier.height(12.dp)) // Отступ перед списком задач
         // Box для наложения кнопки на TextField
@@ -44,22 +66,24 @@ fun TaskScreen() {
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 label = { Text("Добавить задачу") },
-                modifier = Modifier.fillMaxWidth() // Заполняет всю информацию
-            )
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                )
 
             // Кнопка, наложенная на TextField
             Button(
                 onClick = {
                     if (searchQuery.isNotBlank()) {
-                        viewModel.insertTask(Task(title = searchQuery, time = selectedTime), context)
+                        viewModel.insertTask(Task(title = searchQuery, time = selectedTime))
                     }
 //                    scheduleNotification()
                     searchQuery = ""
                     selectedTime = ""
                 },
                 modifier = Modifier
-                    .align(Alignment.CenterEnd) // Центрировать по вертикали и прислонить к правой стороне
-                    .padding(start = 8.dp) // Добавляем отступ слева, чтобы кнопка не была прижата к текстовому полю
+                    .align(Alignment.CenterEnd)
+                    .padding(start = 8.dp),
+                shape = RoundedCornerShape(12.dp),
             ) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "Добавить")
             }
@@ -72,11 +96,22 @@ fun TaskScreen() {
             TimePickerDialog(context, { _, selectedHour, selectedMinute ->
                 selectedTime = String.format("%02d:%02d", selectedHour, selectedMinute)
             }, hour, minute, true).show()
-        }) {
+        },
+        shape = RoundedCornerShape(12.dp),
+        ) {
             Text(text = if (selectedTime.isEmpty()) "Выберите время" else selectedTime)
         }
-        Spacer(modifier = Modifier.height(16.dp)) // Отступ перед списком задач
+        Spacer(modifier = Modifier.height(12.dp)) // Отступ перед списком задач
         // Отображение задач
-        TaskCardScreen(viewModel)
+        TaskCardScreen(
+            viewModel = viewModel,
+            onEditText = onEditText,
+            onRequestDelete = { task ->
+                taskToDelete = task
+                playAnimation = true
+            }
+        )
+
+
     }
 }

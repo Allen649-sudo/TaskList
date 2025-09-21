@@ -1,7 +1,7 @@
 package com.example.tasklist
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
-class App : Application() {
-    val database by lazy { AppDatabase.getDatabase(this) }
-}
+@HiltAndroidApp
+class App : Application()

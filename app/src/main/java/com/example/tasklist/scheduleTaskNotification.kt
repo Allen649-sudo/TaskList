@@ -15,12 +15,11 @@ fun scheduleTaskNotification(context: Context, taskId: Int, title: String, time:
 
     val pendingIntent = PendingIntent.getBroadcast(
         context,
-        taskId, // уникальный requestCode для каждой задачи
+        taskId,
         intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
-    // Парсим время задачи (например "15:30")
     val parts = time.split(":")
     if (parts.size != 2) return
     val hour = parts[0].toIntOrNull() ?: return
@@ -32,7 +31,7 @@ fun scheduleTaskNotification(context: Context, taskId: Int, title: String, time:
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
         if (before(Calendar.getInstance())) {
-            add(Calendar.DATE, 1) // если время уже прошло сегодня
+            add(Calendar.DATE, 1)
         }
     }
 

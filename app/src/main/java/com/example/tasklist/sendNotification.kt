@@ -10,20 +10,27 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import android.Manifest
 
+//показывает уведомление с текстом задачи.
 class AlarmReceiver : BroadcastReceiver() {
-    private val CHANNEL_ID = "channel_id"
-
     override fun onReceive(context: Context, intent: Intent) {
         val taskTitle = intent.getStringExtra("taskTitle") ?: "Задача"
         sendNotification(context, taskTitle)
     }
 
     private fun sendNotification(context: Context, taskTitle: String) {
-        val intent = Intent(context, MainActivity::class.java).apply {
+        val channelId = "channel_id"
+
+        val notificationIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("Напоминание")
             .setContentText(taskTitle)
@@ -43,3 +50,4 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 }
+

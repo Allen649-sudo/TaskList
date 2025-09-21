@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface TaskDao {
@@ -13,6 +14,9 @@ interface TaskDao {
 
     @Query("SELECT * FROM task_table")
     suspend fun getAllTasks(): List<Task>
+
+    @Update
+    suspend fun update(task: Task)
 
     @Delete
     suspend fun delete(task: Task)
